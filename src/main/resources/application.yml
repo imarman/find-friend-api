@@ -1,0 +1,34 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: find-my-friend
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://rm-uf6ewv76mc3a24k530o.mysql.rds.aliyuncs.com/find-friend?serverTimezone=Asia/Shanghai
+    username: ENC(RI7LqiV+W1TRGUEoHlpQ3w==)
+    password: ENC(kfQcMcgaVJMrtTuf+RfuJk9ftGBebFis)
+  # redis 配置
+  redis:
+    port: 6379
+    host: ENC(hwDTMw8Iovp3jLkGx6cr1Aymrb+PYWXm)
+    database: 0
+    password: ENC(ftFch9jsAJyVBxZxa7iH2A==)
+    lettuce:
+      pool:
+        # 规定时间内连接池能够分配的连接的最大数量
+        max-active: 8
+        # 连接池中允许空闲连接的最大数量
+        max-idle: 8
+        # 连接池中允许空闲连接的最小数量
+        min-idle: 0
+        # 连接分配最大等待时间，负数表示一直等待分配连接
+        max-wait: -1ms
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted # 全局逻辑删除的实体字段名, 跟 model 的字段名对应，而不是数据库的字段
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
