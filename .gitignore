@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /src/test/java/com/arman/findmyfriend/GeneratePass.java
+/src/main/resources/application-dev.yml

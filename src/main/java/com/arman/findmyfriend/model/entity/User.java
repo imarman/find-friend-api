@@ -1,10 +1,11 @@
-package com.arman.findmyfriend.entity;
+package com.arman.findmyfriend.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import lombok.Data;
 
@@ -64,12 +65,12 @@ public class User implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 是否删除

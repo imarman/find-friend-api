@@ -1,6 +1,6 @@
 package com.arman.findmyfriend.mapper;
 
-import com.arman.findmyfriend.entity.User;
+import com.arman.findmyfriend.model.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
