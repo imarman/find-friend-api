@@ -2,7 +2,6 @@ package com.arman.findmyfriend.service;
 
 import com.arman.findmyfriend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -54,5 +53,12 @@ public interface UserService extends IService<User> {
      * @param tags
      * @return
      */
-    List<User> searchUsersByTags(List<String> tags);
+    List<User> searchUsersByTagsSQL(List<String> tags);
+
+    /**
+     * 根据标签所有用户
+     * @param tags
+     * @return
+     */
+    List<User> searchUsersByTagsMemory(List<String> tags);
 }

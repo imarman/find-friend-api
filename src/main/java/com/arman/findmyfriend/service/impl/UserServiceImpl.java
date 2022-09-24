@@ -155,23 +155,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return 1;
     }
 
+    /**
+     * 方法一：在数据库中 like
+     *
+     * @param tags 标签列表
+     * @return 用户列表
+     */
+    @Deprecated
     @Override
-    public List<User> searchUsersByTags(List<String> tags) {
-        // 方法一：在数据库中 like
+    public List<User> searchUsersByTagsSQL(List<String> tags) {
         LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
         for (String tag : tags) {
             wrapper = wrapper.like(User::getTags, tag);
         }
         List<User> users = getBaseMapper().selectList(wrapper);
         return users.stream().map(this::getSafetyUser).collect(Collectors.toList());
+    }
 
-
-        // 方法二：在内存操作，用户量大了之后就很慢，里面有反序列化操作
+    /**
+     * 方法二：在内存操作，用户量大了之后就很慢，里面有反序列化操作
+     *
+     * @param tags 标签列表
+     * @return 用户列表
+     */
+    @Override
+    public List<User> searchUsersByTagsMemory(List<String> tags) {
         // 查询所有用户
-        // List<User> users = getBaseMapper().selectList(null);
-        // Gson gson = new Gson();
-        // // 在内存中判断是否包含要求的标签
-        // return users.stream().filter(user -> filterUsersByTag(user, tags, gson)).collect(Collectors.toList());
+        List<User> users = getBaseMapper().selectList(null);
+        Gson gson = new Gson();
+        // 在内存中判断是否包含要求的标签
+        return users.stream().filter(user -> filterUsersByTag(user, tags, gson)).collect(Collectors.toList());
     }
 
     /**

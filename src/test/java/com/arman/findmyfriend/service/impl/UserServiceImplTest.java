@@ -83,7 +83,7 @@ class UserServiceImplTest {
 
     @Test
     public void testSearchByTags() {
-        List<User> users = userService.searchUsersByTags(Arrays.asList("java", "python"));
+        List<User> users = userService.searchUsersByTagsSQL(Arrays.asList("java", "python"));
         Assert.notEmpty(users, "is empty");
     }
 
