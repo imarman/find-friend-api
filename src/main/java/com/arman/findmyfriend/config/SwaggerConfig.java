@@ -1,5 +1,5 @@
 package com.arman.findmyfriend.config;
- 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -10,7 +10,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * 自定义 Swagger 接口文档的配置
@@ -18,7 +18,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
  * @author Arman
  */
 @Configuration
-@EnableSwagger2WebMvc
+// @EnableSwagger2WebMvc
+@EnableSwagger2
 @Profile({"dev", "test"})
 public class SwaggerConfig {
 
@@ -39,10 +40,10 @@ public class SwaggerConfig {
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("鱼皮用户中心")
-                .description("鱼皮用户中心接口文档")
-                .termsOfServiceUrl("https://github.com/liyupi")
-                .contact(new Contact("yupi","https://github.com/liyupi","xxx@qq.com"))
+                .title("Find My Friend 接口文档")
+                .description("Find My Friend 接口文档")
+                .termsOfServiceUrl("https://github.com/imarman")
+                .contact(new Contact("pumpkin","https://github.com/imarman","xxx@qq.com"))
                 .version("1.0")
                 .build();
     }

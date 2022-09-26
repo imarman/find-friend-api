@@ -29,11 +29,11 @@ class UserServiceImplTest {
     @Test
     public void testAddUser() {
         User user = new User();
-        user.setUsername("dogYupi");
+        user.setUsername("tt");
         user.setUserAccount("123");
         user.setAvatarUrl("https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png");
         user.setGender(0);
-        user.setUserPassword("xxx");
+        user.setUserPassword("12345678");
         user.setPhone("123");
         user.setEmail("456");
         boolean result = userService.save(user);
@@ -70,10 +70,10 @@ class UserServiceImplTest {
 
     @Test
     void userRegister() {
-        String userAccount = "chandler";
+        String userAccount = "tttt";
         String userPassword = "12345678";
         String checkPassword = "12345678";
-        String planetCode = "1";
+        String planetCode = "1999";
         long result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
         Assertions.assertEquals(-1, result);
         userAccount = "joye";

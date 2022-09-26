@@ -4,16 +4,19 @@ import com.arman.findmyfriend.common.BaseResponse;
 import com.arman.findmyfriend.common.ErrorCode;
 import com.arman.findmyfriend.common.ResultUtils;
 import com.arman.findmyfriend.constant.UserConstant;
+import com.arman.findmyfriend.model.entity.Tag;
 import com.arman.findmyfriend.model.entity.User;
 import com.arman.findmyfriend.exception.BusinessException;
 import com.arman.findmyfriend.model.req.UserLoginRequest;
 import com.arman.findmyfriend.model.req.UserRegisterRequest;
 import com.arman.findmyfriend.service.UserService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,7 +24,7 @@ import java.util.List;
  * @date 2022/9/24 00:57
  */
 @RestController
-@RequestMapping
+@RequestMapping("user")
 public class UserController {
 
 
@@ -84,6 +87,14 @@ public class UserController {
         User user = userService.getById(userId);
         User safetyUser = userService.getSafetyUser(user);
         return ResultUtils.success(safetyUser);
+    }
+
+
+    @GetMapping("/getUsersByTags")
+    public BaseResponse<List<User>> getUserByTags(@RequestParam(required = false) List<String> tags) {
+        if (CollectionUtils.isEmpty(tags)) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+
+        return ResultUtils.success(userService.searchUsersByTagsMemory(tags));
     }
 
 }
