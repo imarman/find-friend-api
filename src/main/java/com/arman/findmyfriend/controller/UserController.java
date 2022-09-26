@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Arman
@@ -55,14 +56,17 @@ public class UserController {
     @PostMapping("/login")
     public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = userService.userLogin(userAccount, userPassword, request);
+        if (Objects.isNull(user)) {
+            throw new BusinessException(ErrorCode.NO_FIND_USER);
+        }
         return ResultUtils.success(user);
     }
 
@@ -77,8 +81,8 @@ public class UserController {
 
     @GetMapping("/current")
     public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
-        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+
+        User currentUser = userService.getLoginUser(request);
         if (currentUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN);
         }
@@ -95,6 +99,17 @@ public class UserController {
         if (CollectionUtils.isEmpty(tags)) throw new BusinessException(ErrorCode.PARAMS_ERROR);
 
         return ResultUtils.success(userService.searchUsersByTagsMemory(tags));
+    }
+
+    @PutMapping("/update")
+    public BaseResponse<Integer> updateUser(HttpServletRequest request, @RequestBody User user) {
+        // 校验参数
+        if (Objects.isNull(user) || Objects.isNull(user.getId())) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+
+        User loginUser = userService.getLoginUser(request);
+
+
+        return ResultUtils.success(userService.updateUser(loginUser, user));
     }
 
 }

@@ -4,7 +4,6 @@ import com.arman.findmyfriend.common.ErrorCode;
 import com.arman.findmyfriend.constant.UserConstant;
 import com.arman.findmyfriend.exception.BusinessException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.arman.findmyfriend.model.entity.User;
@@ -13,14 +12,14 @@ import com.arman.findmyfriend.mapper.UserMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -93,19 +92,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if (userAccount.length() < 4) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "名称太短");
         }
-        if (userPassword.length() < 8) {
-            return null;
-        }
+        // if (userPassword.length() < 8) {
+        //     return null;
+        // }
         // 账户不能包含特殊字符
         String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码不能包含特殊符号");
         }
         // 2. 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
@@ -118,7 +117,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 用户不存在
         if (user == null) {
             log.info("user login failed, userAccount cannot match userPassword");
-            return null;
+            throw new BusinessException(ErrorCode.NO_FIND_USER, "账号或密码错误");
         }
         // 3. 用户脱敏
         User safetyUser = getSafetyUser(user);
@@ -188,6 +187,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return users.stream().filter(user -> filterUsersByTag(user, tags, gson)).map(this::getSafetyUser).collect(Collectors.toList());
     }
 
+    @Override
+    public int updateUser(User loginUser, User user) {
+        // 允许修改自己的信息
+        if (loginUser.getId().equals(user.getId())) {
+            return getBaseMapper().updateById(user);
+        }
+
+        // 如果是管理员，可以更新任意用户
+        if (!isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH, "无权修改他人信息");
+        }
+        return getBaseMapper().updateById(user);
+    }
+
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (Objects.isNull(request)) return null;
+
+        Object loginUser = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+
+        if (Objects.isNull(loginUser)) throw new BusinessException(ErrorCode.NOT_LOGIN);
+
+        return (User) loginUser;
+    }
+
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        User userObj = getLoginUser(request);
+        return Objects.nonNull(userObj) && userObj.getUserRole() == UserConstant.ADMIN_ROLE;
+    }
+
+    @Override
+    public boolean isAdmin(User user) {
+        return Objects.nonNull(user) && user.getUserRole() == UserConstant.ADMIN_ROLE;
+    }
+
     /**
      * 用户是否拥有所有的标签
      *
@@ -204,7 +239,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }.getType());
         return tempTagsSet.containsAll(tags);
     }
-
 }
 
 
